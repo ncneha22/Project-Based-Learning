@@ -1,1 +1,1 @@
-# Types and Importance of IPC
+# Types and Importance of Inter-Process Communication
