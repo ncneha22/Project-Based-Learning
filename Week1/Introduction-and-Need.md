@@ -1,1 +1,1 @@
-# Introduction and Need of Inter-Process CCommunication (IPC)
+# Introduction and Need of Inter-Process Communication (IPC)
