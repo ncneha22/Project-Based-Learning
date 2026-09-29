@@ -1,1 +1,81 @@
 # Types and Importance of Inter-Process Communication (IPC)
+
+Types of Inter-Process Communication (IPC)
+
+1. Pipe
+
+A pipe is a communication channel used to send data from one process to another.
+
+- Mainly used between related processes.
+- Data is transferred sequentially.
+- One process writes data and another process reads it.
+
+2. Message Queue
+
+A message queue allows processes to communicate by sending and receiving messages through a queue.
+
+- Messages are stored until the receiving process is ready.
+- Processes do not need to communicate at the same time.
+- Useful for exchanging structured messages.
+
+3. Shared Memory
+
+Shared memory allows multiple processes to access the same area of memory.
+
+- It is a fast IPC method.
+- Processes can directly read and write shared data.
+- Synchronization is needed to avoid conflicts.
+
+4. Semaphore
+
+A semaphore is used to control access to shared resources.
+
+- Helps synchronize processes.
+- Prevents multiple processes from accessing a resource at the same time.
+- Helps avoid conflicts.
+
+5. Socket
+
+A socket allows processes to communicate with each other, even when they are running on different computers.
+
+- Commonly used for network communication.
+- Used in client-server applications.
+- Example: Communication between a web browser and a web server.
+
+6. Signal
+
+A signal is a notification sent to a process to inform it that an event has occurred.
+
+- Used for process control and notification.
+- Can be sent by another process or the operating system.
+- Example: A process receiving a signal to terminate.
+
+Importance of Inter-Process Communication
+
+1. Data Sharing
+
+Allows different processes to share and exchange data.
+
+2. Process Synchronization
+
+Helps processes coordinate their activities and maintain the correct order of execution.
+
+3. Resource Sharing
+
+Allows processes to safely share resources such as memory and files.
+
+4. Improved Efficiency
+
+Allows different processes to perform tasks simultaneously, improving system efficiency.
+
+5. Communication
+
+Provides a way for processes to communicate with each other on the same computer or across different computers.
+
+6. Prevents Conflicts
+
+Mechanisms such as semaphores help prevent conflicts when processes access shared resources.
+
+7. Supports Client-Server Applications
+
+IPC mechanisms such as sockets allow clients and servers to communicate and exchange information.
