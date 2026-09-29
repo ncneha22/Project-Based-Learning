@@ -1,21 +1,43 @@
 # Introduction and Need of Inter-Process Communication (IPC)
 
-Inter-Process Communication (IPC) is a mechanism that allows two or more processes to communicate and exchange data with each other.
+ Introduction
+Interprocess Communication (IPC) is a set of mechanisms provided by the operating system that lets processes exchange data and synchronize their actions.
 
-A process is a program that is currently running. Since processes usually have separate memory spaces, IPC provides methods for them to safely share information and coordinate their activities.
+- **Independent process:** does not affect or get affected by other processes.
+- **Cooperating process:** can affect or be affected by other processes, so it
+  needs IPC.
 
-#Need for Inter-Process Communication
-IPC is needed because:
-•Data Sharing – Allows processes to exchange and share data.
-•Process Coordination – Helps processes work together in a proper order.
-•Resource Sharing – Allows processes to share resources such as files, memory, and devices.
-•Faster Execution – Different processes can perform parts of a task simultaneously.
-•Synchronization – Prevents conflicts when multiple processes access shared resources.
-•Communication – Helps processes send and receive messages or information.
+Since each process has its own separate address space, one process cannot directly access another's memory. The OS must provide a controlled channel.
 
-#Common IPC Methods
-  •Pipes
-  •Message Queues
-  •Shared Memory
-  •Semaphores
-  •Sockets
+## Need for IPC
+1. **Information sharing:** several processes may need the same data (e.g., a
+   shared file or database).
+2. **Computation speedup:** a task can be split into subtasks that run in
+   parallel on multiple CPUs/cores and share results.
+3. **Modularity:** a system can be divided into separate processes or threads
+   that communicate (e.g., microservices, client-server).
+4. **Convenience:** a user can run many tasks at once (editing, printing,
+   compiling) that need to coordinate.
+5. **Synchronization:** ensures processes access shared resources in the right
+   order and avoids race conditions.
+6. **Privilege separation:** a low-privilege process can safely request
+   services from a high-privilege one.
+
+## Models of IPC
+| Model | How it works | Examples |
+|---|---|---|
+| Shared memory | A memory region is shared; processes read/write it directly. Fast, but needs synchronization. | POSIX shared memory, mmap |
+| Message passing | Processes exchange messages via OS using send() and receive(). Easier to use, slower due to kernel involvement. | Pipes, message queues, sockets |
+
+## Common IPC Mechanisms
+- Pipes and named pipes (FIFOs)
+- Message queues
+- Shared memory
+- Semaphores and mutexes (for synchronization)
+- Sockets
+- Signals
+
+## Issues in IPC
+- Race conditions
+- Deadlock
+- Synchronization overhead
