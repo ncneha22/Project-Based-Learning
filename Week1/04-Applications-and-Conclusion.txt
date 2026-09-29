@@ -1,3 +1,6 @@
+Name - Sree Charan
+Register number - 25191126
+
 # Applications and Conclusion of Inter-Process Communication (IPC)
 
 Inter-Process Communication is an important component of operating systems and is used whenever independent processes need to exchange information or coordinate their activities. Some major applications of IPC are as follows:
