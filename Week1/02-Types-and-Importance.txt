@@ -1,3 +1,6 @@
+Name - Neha NC
+Register number - 25191135
+
 # Types and Importance of Inter-Process Communication (IPC)
 
 Types of Inter-Process Communication (IPC)
