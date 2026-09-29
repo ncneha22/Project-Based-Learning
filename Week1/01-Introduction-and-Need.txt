@@ -1,6 +1,9 @@
 # Introduction and Need of Inter-Process Communication (IPC)
+
 Inter-Process Communication (IPC) is a mechanism that allows two or more processes to communicate and exchange data with each other.
+
 A process is a program that is currently running. Since processes usually have separate memory spaces, IPC provides methods for them to safely share information and coordinate their activities.
+
 #Need for Inter-Process Communication
 IPC is needed because:
 •Data Sharing – Allows processes to exchange and share data.
@@ -9,6 +12,7 @@ IPC is needed because:
 •Faster Execution – Different processes can perform parts of a task simultaneously.
 •Synchronization – Prevents conflicts when multiple processes access shared resources.
 •Communication – Helps processes send and receive messages or information.
+
 #Common IPC Methods
   •Pipes
   •Message Queues
