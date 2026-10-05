@@ -16,11 +16,19 @@ int execute_command(const char *command)
     if (sscanf(command, "%19s %d %d", operation, &a, &b) >= 1)
     {
         if (strcmp(operation, "ADD") == 0)
-        {
-            result = cpu_add(a, b);
-            printf("CPU: %d\n", result);
-            return 1;
-        }
+{
+    result = cpu_add(a, b);
+
+    char log_message[256];
+
+    snprintf(log_message, sizeof(log_message),
+             "CPU: %d", result);
+
+    printf("%s\n", log_message);
+    ipc_send_log(log_message);
+
+    return 1;
+}
 
         if (strcmp(operation, "SUB") == 0)
         {
