@@ -1,62 +1,49 @@
 # Multi-Process Simulator Architecture
 
-## Processes
+## Architecture Diagram
 
-UI Process
-    |
-    | User commands
-    v
-POSIX Message Queue
-    |
-    v
-Core Process
-    |
-    | Execution / Error information
-    v
-POSIX Message Queue
-    |
-    v
-Logging Process
+                 ┌─────────────────┐
+                 │    UI Process   │
+                 │ User Interaction│
+                 └────────┬────────┘
+                          │
+                    User Commands
+                          │
+                          ▼
+              ┌──────────────────────┐
+              │ POSIX Message Queue  │
+              └──────────┬───────────┘
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │ Core Process  │
+                 │               │
+                 │ CPU           │
+                 │ Memory        │
+                 │ Stack         │
+                 │ Queue         │
+                 └───────┬───────┘
+                         │
+                 Execution / Error
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ POSIX Message Queue  │
+              └──────────┬───────────┘
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │Logger Process │
+                 │Execution and  │
+                 │Error Logging  │
+                 └───────────────┘
 
-Core Process
-    |
-    | Result
-    v
-UI Process
-
-# Multi-Process Simulator Architecture
-
-## Processes
-
-UI Process
-    |
-    | User commands
-    v
-POSIX Message Queue
-    |
-    v
-Core Process
-    |
-    | Execution / Error information
-    v
-POSIX Message Queue
-    |
-    v
-Logging Process
-
-Core Process
-    |
-    | Result
-    v
-UI Process
-
-## Core Components
-
-The Core Process contains:
-- CPU
-- Memory
-- Stack
-- Queue
+                 Core Process
+                      │
+                    Result
+                      │
+                      ▼
+                 UI Process
 
 ## IPC Mechanism
 
