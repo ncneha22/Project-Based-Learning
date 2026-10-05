@@ -4,10 +4,11 @@
 #include <fcntl.h>
 #include <mqueue.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 static mqd_t ui_to_core_queue;
-static mqd_t core_to_logger_queue;
+static mqd_t core_to_ui_queue;
 
 int ipc_open_queues(void)
 {
@@ -31,16 +32,16 @@ int ipc_open_queues(void)
         return 0;
     }
 
-    core_to_logger_queue = mq_open(
-        CORE_TO_LOGGER,
+    core_to_ui_queue = mq_open(
+        CORE_TO_UI,
         O_CREAT | O_WRONLY,
         0666,
         &attributes
     );
 
-    if (core_to_logger_queue == (mqd_t)-1)
+    if (core_to_ui_queue == (mqd_t)-1)
     {
-        perror("Error opening Core to Logger queue");
+        perror("Error opening Core to UI queue");
         mq_close(ui_to_core_queue);
         return 0;
     }
@@ -70,17 +71,44 @@ int ipc_receive(char *message)
     return 1;
 }
 
-int ipc_send_log(const char *message)
+int ipc_send_ui(const char *message)
 {
     if (mq_send(
-            core_to_logger_queue,
+            core_to_ui_queue,
             message,
             strlen(message) + 1,
             0) == -1)
     {
-        perror("Error sending message to logger");
+        perror("Error sending message to UI");
         return 0;
     }
+
+    return 1;
+}
+
+int ipc_send_log(const char *message)
+{
+    int fd;
+    char buffer[MAX_MESSAGE_SIZE];
+
+    fd = open(LOGGER_FIFO, O_WRONLY);
+
+    if (fd == -1)
+    {
+        perror("Error opening logger FIFO");
+        return 0;
+    }
+
+    snprintf(buffer, sizeof(buffer), "INFO|%s", message);
+
+    if (write(fd, buffer, strlen(buffer)) == -1)
+    {
+        perror("Error writing to logger FIFO");
+        close(fd);
+        return 0;
+    }
+
+    close(fd);
 
     return 1;
 }
@@ -88,11 +116,11 @@ int ipc_send_log(const char *message)
 void ipc_close_queues(void)
 {
     mq_close(ui_to_core_queue);
-    mq_close(core_to_logger_queue);
+    mq_close(core_to_ui_queue);
 }
 
 void ipc_cleanup(void)
 {
     mq_unlink(UI_TO_CORE);
-    mq_unlink(CORE_TO_LOGGER);
+    mq_unlink(CORE_TO_UI);
 }

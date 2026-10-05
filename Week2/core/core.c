@@ -12,35 +12,47 @@ int execute_command(const char *command)
     char operation[20];
     int a, b;
     int result;
+    char response[256];
 
     if (sscanf(command, "%19s %d %d", operation, &a, &b) >= 1)
     {
         if (strcmp(operation, "ADD") == 0)
-{
-    result = cpu_add(a, b);
+        {
+            result = cpu_add(a, b);
 
-    char log_message[256];
+            snprintf(response, sizeof(response),
+                     "CPU: %d", result);
 
-    snprintf(log_message, sizeof(log_message),
-             "CPU: %d", result);
+            printf("%s\n", response);
+            ipc_send_ui(response);
+            ipc_send_log(response);
 
-    printf("%s\n", log_message);
-    ipc_send_log(log_message);
-
-    return 1;
-}
+            return 1;
+        }
 
         if (strcmp(operation, "SUB") == 0)
         {
             result = cpu_sub(a, b);
-            printf("CPU: %d\n", result);
+
+            snprintf(response, sizeof(response),
+                     "CPU: %d", result);
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 1;
         }
 
         if (strcmp(operation, "MUL") == 0)
         {
             result = cpu_mul(a, b);
-            printf("CPU: %d\n", result);
+
+            snprintf(response, sizeof(response),
+                     "CPU: %d", result);
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 1;
         }
 
@@ -48,26 +60,49 @@ int execute_command(const char *command)
         {
             if (b == 0)
             {
-                printf("ERROR: Division by zero\n");
+                snprintf(response, sizeof(response),
+                         "ERROR: Division by zero");
+
+                printf("%s\n", response);
+                ipc_send_ui(response);
+
                 return 0;
             }
 
             result = cpu_div(a, b);
-            printf("CPU: %d\n", result);
+
+            snprintf(response, sizeof(response),
+                     "CPU: %d", result);
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 1;
         }
 
         if (strcmp(operation, "STORE") == 0)
         {
             memory_store(a, b);
-            printf("Memory: stored %d at address %d\n", b, a);
+
+            snprintf(response, sizeof(response),
+                     "Memory: stored %d at address %d", b, a);
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 1;
         }
 
         if (strcmp(operation, "LOAD") == 0)
         {
             result = memory_load(a);
-            printf("Memory: address %d = %d\n", a, result);
+
+            snprintf(response, sizeof(response),
+                     "Memory: address %d = %d", a, result);
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 1;
         }
 
@@ -75,11 +110,21 @@ int execute_command(const char *command)
         {
             if (stack_push(a))
             {
-                printf("Stack: pushed %d\n", a);
+                snprintf(response, sizeof(response),
+                         "Stack: pushed %d", a);
+
+                printf("%s\n", response);
+                ipc_send_ui(response);
+
                 return 1;
             }
 
-            printf("ERROR: Stack is full\n");
+            snprintf(response, sizeof(response),
+                     "ERROR: Stack is full");
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 0;
         }
 
@@ -87,11 +132,21 @@ int execute_command(const char *command)
         {
             if (stack_pop(&result))
             {
-                printf("Stack: popped %d\n", result);
+                snprintf(response, sizeof(response),
+                         "Stack: popped %d", result);
+
+                printf("%s\n", response);
+                ipc_send_ui(response);
+
                 return 1;
             }
 
-            printf("ERROR: Stack is empty\n");
+            snprintf(response, sizeof(response),
+                     "ERROR: Stack is empty");
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 0;
         }
 
@@ -99,11 +154,21 @@ int execute_command(const char *command)
         {
             if (stack_peek(&result))
             {
-                printf("Stack: top = %d\n", result);
+                snprintf(response, sizeof(response),
+                         "Stack: top = %d", result);
+
+                printf("%s\n", response);
+                ipc_send_ui(response);
+
                 return 1;
             }
 
-            printf("ERROR: Stack is empty\n");
+            snprintf(response, sizeof(response),
+                     "ERROR: Stack is empty");
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 0;
         }
 
@@ -111,11 +176,21 @@ int execute_command(const char *command)
         {
             if (queue_enqueue(a))
             {
-                printf("Queue: added %d\n", a);
+                snprintf(response, sizeof(response),
+                         "Queue: added %d", a);
+
+                printf("%s\n", response);
+                ipc_send_ui(response);
+
                 return 1;
             }
 
-            printf("ERROR: Queue is full\n");
+            snprintf(response, sizeof(response),
+                     "ERROR: Queue is full");
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 0;
         }
 
@@ -123,11 +198,21 @@ int execute_command(const char *command)
         {
             if (queue_dequeue(&result))
             {
-                printf("Queue: removed %d\n", result);
+                snprintf(response, sizeof(response),
+                         "Queue: removed %d", result);
+
+                printf("%s\n", response);
+                ipc_send_ui(response);
+
                 return 1;
             }
 
-            printf("ERROR: Queue is empty\n");
+            snprintf(response, sizeof(response),
+                     "ERROR: Queue is empty");
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 0;
         }
 
@@ -135,16 +220,31 @@ int execute_command(const char *command)
         {
             if (queue_peek(&result))
             {
-                printf("Queue: front = %d\n", result);
+                snprintf(response, sizeof(response),
+                         "Queue: front = %d", result);
+
+                printf("%s\n", response);
+                ipc_send_ui(response);
+
                 return 1;
             }
 
-            printf("ERROR: Queue is empty\n");
+            snprintf(response, sizeof(response),
+                     "ERROR: Queue is empty");
+
+            printf("%s\n", response);
+            ipc_send_ui(response);
+
             return 0;
         }
     }
 
-    printf("ERROR: Unknown command\n");
+    snprintf(response, sizeof(response),
+             "ERROR: Unknown command");
+
+    printf("%s\n", response);
+    ipc_send_ui(response);
+
     return 0;
 }
 
@@ -177,6 +277,7 @@ int main(void)
 
         if (strcmp(command, "EXIT") == 0)
         {
+            ipc_send_ui("Core Process Stopped");
             ipc_send_log("Core Process Stopped");
             break;
         }
