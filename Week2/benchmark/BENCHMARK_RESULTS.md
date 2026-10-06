@@ -19,7 +19,13 @@ To compare the performance of the standalone simulator with the multi-process si
 - Maximum memory usage: 1528 KB
 
 ### Multi-Process Simulator
-- A valid CPU and memory measurement could not be obtained because the interactive UI did not accept the automated benchmark input correctly.
+- Core CPU usage: 0.0%
+- UI CPU usage: 0.0%
+- Logger CPU usage: 0.0%
+- Core memory (RSS): 1948 KB
+- UI memory (RSS): 1748 KB
+- Logger memory (RSS): 1628 KB
+- Total memory (RSS): 5316 KB (approximately 5.2 MB)
 
 ## IPC Overhead
 
