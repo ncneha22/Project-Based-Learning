@@ -78,6 +78,8 @@ int main()
         if (bytes_read > 0)
         {
             buffer[bytes_read] = '\0';
+            printf("Received: %s\n", buffer);
+            fflush(stdout);
 
             /*
              * INFO messages go to execution.log.

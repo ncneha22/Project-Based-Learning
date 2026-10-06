@@ -39,6 +39,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 1;
         }
@@ -52,6 +53,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 1;
         }
@@ -65,6 +67,7 @@ int execute_command(const char *command)
 
                 printf("%s\n", response);
                 ipc_send_ui(response);
+                ipc_send_log(response);
 
                 return 0;
             }
@@ -76,6 +79,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 1;
         }
@@ -89,7 +93,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
-
+            ipc_send_log(response);
             return 1;
         }
 
@@ -102,6 +106,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 1;
         }
@@ -115,6 +120,7 @@ int execute_command(const char *command)
 
                 printf("%s\n", response);
                 ipc_send_ui(response);
+                ipc_send_log(response);
 
                 return 1;
             }
@@ -124,7 +130,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
-
+            ipc_send_log(response);
             return 0;
         }
 
@@ -137,6 +143,7 @@ int execute_command(const char *command)
 
                 printf("%s\n", response);
                 ipc_send_ui(response);
+                ipc_send_log(response);
 
                 return 1;
             }
@@ -146,6 +153,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 0;
         }
@@ -159,6 +167,7 @@ int execute_command(const char *command)
 
                 printf("%s\n", response);
                 ipc_send_ui(response);
+                ipc_send_log(response);
 
                 return 1;
             }
@@ -168,6 +177,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 0;
         }
@@ -181,6 +191,7 @@ int execute_command(const char *command)
 
                 printf("%s\n", response);
                 ipc_send_ui(response);
+                ipc_send_log(response);
 
                 return 1;
             }
@@ -190,6 +201,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 0;
         }
@@ -203,7 +215,7 @@ int execute_command(const char *command)
 
                 printf("%s\n", response);
                 ipc_send_ui(response);
-
+                ipc_send_log(response);
                 return 1;
             }
 
@@ -212,7 +224,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
-
+            ipc_send_log(response);
             return 0;
         }
 
@@ -225,7 +237,7 @@ int execute_command(const char *command)
 
                 printf("%s\n", response);
                 ipc_send_ui(response);
-
+                ipc_send_log(response);
                 return 1;
             }
 
@@ -234,6 +246,7 @@ int execute_command(const char *command)
 
             printf("%s\n", response);
             ipc_send_ui(response);
+            ipc_send_log(response);
 
             return 0;
         }
@@ -244,6 +257,7 @@ int execute_command(const char *command)
 
     printf("%s\n", response);
     ipc_send_ui(response);
+     ipc_send_log(response);
 
     return 0;
 }
