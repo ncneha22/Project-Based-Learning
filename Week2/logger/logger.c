@@ -74,10 +74,6 @@ int main()
         memset(buffer, 0, BUFFER_SIZE);
 
         ssize_t bytes_read = read(fd, buffer, BUFFER_SIZE - 1);
-        if (bytes_read == 0)
-        {
-           break;
-        }
 
         if (bytes_read > 0)
         {
