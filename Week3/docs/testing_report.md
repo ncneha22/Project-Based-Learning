@@ -99,9 +99,6 @@ The following metrics were checked:
 - RT = First Start Time - Arrival Time
 - CPU Utilization = (Busy Time / Total Elapsed Time) x 100
 
-## 6. Additional Test Program
-
-The additional test program is located at `tests/member2_test.c`. Its compilation and execution should be verified separately before claiming that it passed.
 
 ## 7. Conclusion
 
