@@ -1,5 +1,8 @@
+
 #ifndef PROCESS_H
 #define PROCESS_H
+
+#define MAX_SEGMENTS 1000
 
 typedef struct {
     int pid;
@@ -15,16 +18,31 @@ typedef struct {
     int start_time;
 } Process;
 
-/* FCFS and SJF */
-void fcfs(Process p[], int n);
-void sjf_non_preemptive(Process p[], int n);
-void sjf_preemptive(Process p[], int n);
+typedef struct {
+    int pid;
+    int start_time;
+    int end_time;
+} ExecutionSegment;
 
-/* Priority Scheduling */
-void priority_non_preemptive(Process p[], int n);
-void priority_preemptive(Process p[], int n);
+typedef struct {
+    ExecutionSegment segments[MAX_SEGMENTS];
+    int segment_count;
+} ScheduleResult;
+
+/* FCFS and SJF */
+void fcfs(Process p[], int n, ScheduleResult *result);
+void sjf_non_preemptive(Process p[], int n, ScheduleResult *result);
+void sjf_preemptive(Process p[], int n, ScheduleResult *result);
+
+/* Priority */
+void priority_non_preemptive(Process p[], int n, ScheduleResult *result);
+void priority_preemptive(Process p[], int n, ScheduleResult *result);
 
 /* Round Robin */
-void round_robin(Process p[], int n, int quantum);
+void round_robin(Process p[], int n, int quantum, ScheduleResult *result);
+
+/* Display functions */
+void display_gantt_chart(ScheduleResult *result);
+void display_results(Process p[], int n, ScheduleResult *result);
 
 #endif
