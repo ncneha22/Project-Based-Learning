@@ -38,7 +38,7 @@ Three test cases are provided:
 - Test Case 2: Processes arrive at different times.
 - Test Case 3: A process arrives after the CPU becomes idle.
 
-FCFS, SJF Non-Preemptive, SJF Preemptive (SRTF), and Round Robin have been tested using these cases. Priority scheduling testing will be completed after both Priority algorithms are integrated.
+All six scheduling algorithms have been manually tested using these three test cases. The results were checked against expected calculations. Detailed results are documented in docs/testing_report.md.
 
 ## Compilation
 Compile the complete simulator after all six algorithm implementations are available:
