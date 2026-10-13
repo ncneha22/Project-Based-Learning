@@ -4,6 +4,8 @@
 
 #define MAX_PROCESSES 100
 
+typedef void (*Scheduler)(Process[], int, ScheduleResult *);
+
 static void copy_processes(Process dest[], Process src[], int n)
 {
     int i;
@@ -58,6 +60,86 @@ static int enter_processes(Process p[], int *n)
     return 1;
 }
 
+static void compare_all(Process original[], int n, int quantum)
+{
+    Process working[MAX_PROCESSES];
+    ScheduleResult result;
+
+    Scheduler algorithms[] = {
+        fcfs,
+        sjf_non_preemptive,
+        sjf_preemptive,
+        priority_non_preemptive,
+        priority_preemptive
+    };
+
+    const char *names[] = {
+        "FCFS",
+        "SJF Non-Preemptive",
+        "SJF Preemptive (SRTF)",
+        "Priority Non-Preemptive",
+        "Priority Preemptive"
+    };
+
+    int i, j;
+    int total_burst, total_elapsed;
+    float avg_wt, avg_tat, avg_rt, cpu_util;
+
+    printf("\n========== ALGORITHM COMPARISON ==========\n");
+    printf("Round Robin Time Quantum: %d\n\n", quantum);
+
+    printf("%-27s %10s %10s %10s %12s\n",
+           "Algorithm", "Avg WT", "Avg TAT", "Avg RT", "CPU Util %");
+    printf("--------------------------------------------------------------------------\n");
+
+    for (i = 0; i < 6; i++) {
+        copy_processes(working, original, n);
+        result.segment_count = 0;
+
+        if (i < 5)
+            algorithms[i](working, n, &result);
+        else
+            round_robin(working, n, quantum, &result);
+
+        total_burst = 0;
+        avg_wt = 0;
+        avg_tat = 0;
+        avg_rt = 0;
+
+        for (j = 0; j < n; j++) {
+            total_burst += working[j].burst_time;
+            avg_wt += working[j].waiting_time;
+            avg_tat += working[j].turnaround_time;
+            avg_rt += working[j].response_time;
+        }
+
+        avg_wt /= n;
+        avg_tat /= n;
+        avg_rt /= n;
+
+        total_elapsed = 0;
+        cpu_util = 0;
+
+        if (result.segment_count > 0) {
+            total_elapsed =
+                result.segments[result.segment_count - 1].end_time;
+
+            if (total_elapsed > 0)
+                cpu_util = ((float)total_burst / total_elapsed) * 100.0f;
+        }
+
+        if (i < 5) {
+            printf("%-27s %10.2f %10.2f %10.2f %11.2f%%\n",
+                   names[i], avg_wt, avg_tat, avg_rt, cpu_util);
+        } else {
+            printf("%-27s %10.2f %10.2f %10.2f %11.2f%%\n",
+                   "Round Robin", avg_wt, avg_tat, avg_rt, cpu_util);
+        }
+    }
+
+    printf("--------------------------------------------------------------------------\n");
+}
+
 int main(void)
 {
     Process original[MAX_PROCESSES];
@@ -90,7 +172,8 @@ int main(void)
         printf("4. Priority Non-Preemptive\n");
         printf("5. Priority Preemptive\n");
         printf("6. Round Robin\n");
-        printf("7. New Test Case\n");
+        printf("7. Compare All Algorithms\n");
+        printf("8. New Test Case\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
 
@@ -105,13 +188,28 @@ int main(void)
             continue;
         }
 
-        if (choice == 7) {
+        if (choice == 8) {
             new_test_case = 1;
             continue;
         }
 
-        if (choice < 1 || choice > 6) {
+        if (choice < 1 || choice > 8) {
             printf("Invalid choice. Please try again.\n");
+            continue;
+        }
+
+        if (choice == 7) {
+            printf("Enter time quantum for Round Robin comparison: ");
+
+            if (scanf("%d", &quantum) != 1 || quantum <= 0) {
+                printf("Invalid time quantum!\n");
+                continue;
+            }
+
+            compare_all(original, n, quantum);
+
+            /* Automatically request a new test case after comparison. */
+            new_test_case = 1;
             continue;
         }
 
