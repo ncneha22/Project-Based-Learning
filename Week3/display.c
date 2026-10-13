@@ -2,40 +2,50 @@
 #include <stdio.h>
 #include "process.h"
 
-void display_gantt_chart(ScheduleResult *result) {
+void display_gantt_chart(ScheduleResult *result)
+{
     int i;
 
     printf("\nGANTT CHART\n");
     printf("-----------\n");
 
-    if (result->segment_count == 0) {
+    if (result == NULL || result->segment_count == 0) {
         printf("No execution segments recorded.\n");
         return;
     }
 
     for (i = 0; i < result->segment_count; i++) {
-        if (result->segments[i].pid == -1) {
+        if (result->segments[i].pid == -1)
             printf("| IDLE ");
-        } else {
+        else
             printf("| P%d ", result->segments[i].pid);
-        }
     }
-    printf("|\n");
 
+    printf("|\n");
     printf("%d", result->segments[0].start_time);
 
-    for (i = 0; i < result->segment_count; i++) {
+    for (i = 0; i < result->segment_count; i++)
         printf("\t%d", result->segments[i].end_time);
-    }
+
     printf("\n");
 }
 
-void display_results(Process p[], int n, ScheduleResult *result) {
+void display_results(Process p[], int n, ScheduleResult *result)
+{
     int i;
+    int total_burst = 0;
+    int total_idle = 0;
+    int total_busy = 0;
+    int total_elapsed = 0;
+    int first_start, last_end;
+
     float total_tat = 0;
     float total_wt = 0;
     float total_rt = 0;
-    int total_burst = 0;
+    float utilization = 0;
+
+    if (p == NULL || result == NULL || n <= 0)
+        return;
 
     printf("\nPROCESS RESULTS\n");
     printf("----------------------------------------------------------------\n");
@@ -64,18 +74,25 @@ void display_results(Process p[], int n, ScheduleResult *result) {
     printf("Average Waiting Time: %.2f\n", total_wt / n);
     printf("Average Response Time: %.2f\n", total_rt / n);
 
+    first_start = 0;
+    last_end = result->segments[result->segment_count - 1].end_time;
+
     if (result->segment_count > 0) {
-        int first_start = result->segments[0].start_time;
-        int last_end =
-            result->segments[result->segment_count - 1].end_time;
-        int elapsed = last_end - first_start;
+        total_elapsed = last_end - first_start;
+        total_busy = total_burst;
+        total_idle = total_elapsed - total_busy;
 
-        if (elapsed > 0) {
-            float utilization =
-                ((float)total_burst / elapsed) * 100.0f;
+        if (total_idle < 0)
+            total_idle = 0;
 
-            printf("CPU Utilization: %.2f%%\n", utilization);
-            printf("CPU Idle Time: %d\n", elapsed - total_burst);
-        }
+        if (total_elapsed > 0)
+            utilization = ((float)total_busy / total_elapsed) * 100.0f;
     }
+
+    printf("\nPERFORMANCE METRICS\n");
+    printf("-------------------\n");
+    printf("CPU Busy Time: %d\n", total_busy);
+    printf("CPU Idle Time: %d\n", total_idle);
+    printf("Total Elapsed Time: %d\n", total_elapsed);
+    printf("CPU Utilization: %.2f%%\n", utilization);
 }
