@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const recoverButton = document.getElementById("recoverBtn");
     const requestButton = document.getElementById("requestResourcesBtn");
     const statusButton = document.getElementById("statusBtn");
+    const resetButton = document.getElementById("resetSimulationBtn");  
 
     // RESOURCE UTILIZATION ANALYSIS
     function updateResourceUtilization() {
@@ -286,7 +287,20 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+    // RESET SIMULATION
+    if (resetButton) {
+        resetButton.addEventListener("click", function () {
+            const confirmReset = confirm(
+                "Are you sure you want to reset the simulation?"
+            );
 
+            if (!confirmReset) {
+                return;
+            }
+
+            window.location.reload();
+        });
+    }
     // INITIAL DISPLAY
     updateResourceUtilization();
 
