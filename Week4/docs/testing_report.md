@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This report documents the testing status of the Interactive Deadlock Simulation System, including resource allocation, Banker's Algorithm, resource requests, deadlock detection, recovery, Resource Allocation Graph visualization, and resource utilization analysis.
+This report documents the testing status of the Interactive Deadlock Simulation System, including resource allocation, Banker's Algorithm, resource requests, deadlock detection, recovery, Resource Allocation Graph visualization, resource utilization analysis, and simulation reset functionality.
 
 ## 2. Test Environment
 
@@ -78,6 +78,8 @@ The following safe-state scenario was previously recorded.
 | Deadlock recovery | Recovery resolves a deadlock and updates the system state correctly | Pending verification |
 | Resource utilization | Allocation totals, available resources, total resources, utilization percentages, waiting processes, and deadlocked processes are displayed correctly | Pending browser verification |
 | System status | Status is updated consistently after simulation operations | Pending verification |
+| Reset Simulation | Confirmation popup appears; clicking OK reloads the initial state | Popup and reset tested successfully |
+| Reset cancellation | Clicking Cancel closes the popup and preserves the current simulation | Pending verification |
 
 ## 5. Deadlock Detection and Graph Visualization Test
 
@@ -158,10 +160,35 @@ Previously recorded result: **18/18 tests passed.**
 
 This result applies to the Banker's Algorithm unit tests only. It does not confirm that every integrated GUI feature has passed testing.
 
-## 8. Conclusion
+## 8. Reset Simulation Test
+
+### Test Procedure
+
+1. Open the Deadlock Simulation System in the browser.
+2. Enter the required simulation data.
+3. Click the Reset Simulation button.
+4. Check whether a confirmation popup appears.
+5. Click OK and verify that the page reloads to the initial simulation state.
+
+### Expected Results
+
+- A confirmation popup appears when Reset Simulation is clicked.
+- Clicking OK reloads the application and returns it to the initial state.
+- Clicking Cancel should close the popup without resetting the current simulation.
+
+### Observed Results
+
+- The confirmation popup appeared.
+- After confirmation, the simulation reset successfully.
+
+**Test status:** Popup and reset behavior tested successfully. Cancel behavior requires separate verification.
+
+## 9. Conclusion
 
 The previously recorded safe-state scenario demonstrated a safe resource-allocation state with the expected safe sequence.
 
 The updated deadlock detection and Resource Allocation Graph features were tested using a two-process, two-resource scenario. The application identified P0 and P1 as deadlocked, displayed the waiting chain, and highlighted the deadlocked processes and relevant graph edges in red.
 
-Other scenarios involving unsafe states, resource requests, recovery, resource utilization, and complete application integration require further verification. Test results should be marked as passed only after the corresponding behavior has been checked.
+The Reset Simulation button was also tested. Its confirmation popup appeared, and confirming the reset returned the application to its initial state.
+
+Other scenarios involving unsafe states, resource requests, recovery, resource utilization, reset cancellation, and complete application integration require further verification. Test results should be marked as passed only after the corresponding behavior has been checked.
