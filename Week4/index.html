@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deadlock Simulation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div>
+            <p class="eyebrow">OPERATING SYSTEMS · WEEK 4</p>
+            <h1>Deadlock Simulation System</h1>
+            <p class="subtitle">Interactive resource allocation, deadlock detection and avoidance.</p>
+        </div>
+        <span class="status-badge" id="systemStatus">NOT RUN</span>
+    </header>
+
+    <main class="container">
+        <section class="panel setup-panel">
+            <h2>01 · System Setup</h2>
+            <div class="form-grid">
+                <label>Number of processes
+                    <input type="number" id="processCount" min="1" max="10" value="5">
+                </label>
+                <label>Resource types
+                    <input type="number" id="resourceCount" min="1" max="5" value="3">
+                </label>
+            </div>
+            <button id="createSystemBtn" class="button primary">Create System</button>
+            <p class="hint">Create the process and resource tables before entering values.</p>
+        </section>
+
+        <section class="panel">
+            <h2>02 · Resource Instances</h2>
+            <p class="hint">Enter the total number of instances for each resource type.</p>
+            <div id="resourceInputs" class="resource-inputs">
+                <p>Create a system to enter resources.</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>03 · Resource Allocation Data</h2>
+            <div class="matrix-section">
+                <h3>Allocation Matrix</h3>
+                <div id="allocationMatrix" class="matrix-container">Create a system first.</div>
+            </div>
+            <div class="matrix-section">
+                <h3>Maximum Requirement Matrix</h3>
+                <div id="maximumMatrix" class="matrix-container">Create a system first.</div>
+            </div>
+            <div class="action-row">
+                <button id="calculateNeedBtn" class="button secondary">Calculate Need & Available</button>
+            </div>
+            <div class="matrix-section">
+                <h3>Need Matrix</h3>
+                <div id="needMatrix" class="matrix-container">Need = Maximum − Allocation</div>
+            </div>
+            <div class="matrix-section">
+                <h3>Available Resource Vector</h3>
+                <div id="availableVector" class="vector-display">Not calculated</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>04 · Resource Requests</h2>
+            <div class="form-grid">
+                <label>Process
+                    <select id="requestProcess">
+                        <option value="">Create a system first</option>
+                    </select>
+                </label>
+                <label>Resource request vector
+                    <div id="requestInputs" class="request-inputs">
+                        Create a system first.
+                    </div>
+                </label>
+            </div>
+            <button id="requestResourcesBtn" class="button primary">Request Resources</button>
+            <p class="hint">A request should be granted only when it is valid and leaves the system in a safe state.</p>
+        </section>
+
+        <section class="panel">
+            <h2>05 · Analysis & Recovery</h2>
+            <div class="button-grid">
+                <button id="bankersBtn" class="button primary">Run Banker's Algorithm</button>
+                <button id="detectBtn" class="button secondary">Detect Deadlock</button>
+                <button id="showGraphBtn" class="button secondary">Display Resource Allocation Graph</button>
+                <button id="recoverBtn" class="button danger">Recover from Deadlock</button>
+                <button id="statusBtn" class="button secondary">Display System Status</button>
+            </div>
+            <div id="analysisResult" class="result-box" aria-live="polite">
+                Run an analysis to see the result here.
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>06 · Resource Allocation Graph</h2>
+            <p class="hint">Process and resource relationships will appear here.</p>
+            <div id="ragContainer" class="graph-container">
+                <p>Create a system and display the graph.</p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>07 · System Status</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <span>Processes</span>
+                    <strong id="processSummary">0</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Resource Types</span>
+                    <strong id="resourceSummary">0</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Safe Sequence</span>
+                    <strong id="safeSequenceSummary">—</strong>
+                </div>
+            </div>
+            <div id="systemLog" class="system-log" aria-live="polite">
+                <p>System log is ready.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Deadlock Simulation System · Operating Systems Project · Week 4</p>
+    </footer>
+
+    <script src="js/resourceManager.js"></script>
+    <script src="js/bankers.js"></script>
+    <script src="js/deadlock.js"></script>
+    <script src="js/rag.js"></script>
+    <script src="js/recovery.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
