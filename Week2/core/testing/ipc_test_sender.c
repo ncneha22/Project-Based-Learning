@@ -1,20 +1,39 @@
 #include <stdio.h>
-#include <fcntl.h>
-#include <mqueue.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #include "ipc.h"
 
+/*
+ * Test UI: sends typed commands to Core over the UI -> Core socket.
+ * Core's replies go to the /core_to_ui message queue and are not read here;
+ * watch Core's terminal output instead.
+ */
 int main(void)
 {
-    mqd_t queue;
+    int sock;
+    struct sockaddr_un address;
     char message[256];
+    char buffer[258];
 
-    queue = mq_open(UI_TO_CORE, O_WRONLY);
+    sock = socket(AF_UNIX, SOCK_STREAM, 0);
 
-    if (queue == (mqd_t)-1)
+    if (sock == -1)
     {
-        perror("Error opening UI to Core queue");
+        perror("Error creating socket");
+        return 1;
+    }
+
+    memset(&address, 0, sizeof(address));
+    address.sun_family = AF_UNIX;
+    strncpy(address.sun_path, CORE_SOCKET_PATH, sizeof(address.sun_path) - 1);
+
+    if (connect(sock, (struct sockaddr *)&address, sizeof(address)) == -1)
+    {
+        perror("Error connecting to Core (is Core running?)");
+        close(sock);
         return 1;
     }
 
@@ -31,11 +50,9 @@ int main(void)
 
         message[strcspn(message, "\n")] = '\0';
 
-        if (mq_send(
-                queue,
-                message,
-                strlen(message) + 1,
-                0) == -1)
+        snprintf(buffer, sizeof(buffer), "%s\n", message);
+
+        if (write(sock, buffer, strlen(buffer)) == -1)
         {
             perror("Error sending message");
             break;
@@ -47,8 +64,7 @@ int main(void)
         }
     }
 
-    mq_close(queue);
+    close(sock);
 
     return 0;
 }
-

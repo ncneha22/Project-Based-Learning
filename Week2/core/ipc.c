@@ -6,31 +6,29 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
-static mqd_t ui_to_core_queue;
+/*
+ * One IPC mechanism per receiving process:
+ *   UI -> Core      UNIX domain socket   (Core receives on a socket)
+ *   Core -> UI      POSIX message queue  (UI receives on a message queue)
+ *   Core -> Logger  named FIFO (pipe)    (Logger receives on a pipe)
+ */
+
+static int server_fd = -1;
+static int client_fd = -1;
 static mqd_t core_to_ui_queue;
 
 int ipc_open_queues(void)
 {
     struct mq_attr attributes;
+    struct sockaddr_un address;
 
     attributes.mq_flags = 0;
     attributes.mq_maxmsg = MAX_MESSAGES;
     attributes.mq_msgsize = MAX_MESSAGE_SIZE;
     attributes.mq_curmsgs = 0;
-
-    ui_to_core_queue = mq_open(
-        UI_TO_CORE,
-        O_CREAT | O_RDONLY,
-        0666,
-        &attributes
-    );
-
-    if (ui_to_core_queue == (mqd_t)-1)
-    {
-        perror("Error opening UI to Core queue");
-        return 0;
-    }
 
     core_to_ui_queue = mq_open(
         CORE_TO_UI,
@@ -42,31 +40,94 @@ int ipc_open_queues(void)
     if (core_to_ui_queue == (mqd_t)-1)
     {
         perror("Error opening Core to UI queue");
-        mq_close(ui_to_core_queue);
         return 0;
     }
+
+    server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+
+    if (server_fd == -1)
+    {
+        perror("Error creating socket");
+        mq_close(core_to_ui_queue);
+        return 0;
+    }
+
+    memset(&address, 0, sizeof(address));
+    address.sun_family = AF_UNIX;
+    strncpy(address.sun_path, CORE_SOCKET_PATH, sizeof(address.sun_path) - 1);
+
+    /* Remove a socket file left over from an earlier run */
+    unlink(CORE_SOCKET_PATH);
+
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) == -1)
+    {
+        perror("Error binding socket");
+        close(server_fd);
+        mq_close(core_to_ui_queue);
+        return 0;
+    }
+
+    if (listen(server_fd, 1) == -1)
+    {
+        perror("Error listening on socket");
+        close(server_fd);
+        mq_close(core_to_ui_queue);
+        return 0;
+    }
+
+    printf("Waiting for UI to connect on %s...\n", CORE_SOCKET_PATH);
+
+    client_fd = accept(server_fd, NULL, NULL);
+
+    if (client_fd == -1)
+    {
+        perror("Error accepting UI connection");
+        close(server_fd);
+        mq_close(core_to_ui_queue);
+        return 0;
+    }
+
+    printf("UI connected.\n");
 
     return 1;
 }
 
 int ipc_receive(char *message)
 {
+    int length = 0;
+    char c;
     ssize_t bytes_received;
 
-    bytes_received = mq_receive(
-        ui_to_core_queue,
-        message,
-        MAX_MESSAGE_SIZE,
-        NULL
-    );
-
-    if (bytes_received == -1)
+    /*
+     * A stream socket has no message boundaries, so the UI ends every
+     * command with '\n' and we read one byte at a time up to it.
+     */
+    while (length < MAX_MESSAGE_SIZE - 1)
     {
-        perror("Error receiving message");
-        return 0;
+        bytes_received = read(client_fd, &c, 1);
+
+        if (bytes_received == -1)
+        {
+            perror("Error receiving message");
+            return 0;
+        }
+
+        if (bytes_received == 0)
+        {
+            printf("UI disconnected.\n");
+            return 0;
+        }
+
+        if (c == '\n')
+        {
+            break;
+        }
+
+        message[length] = c;
+        length++;
     }
 
-    message[bytes_received] = '\0';
+    message[length] = '\0';
 
     return 1;
 }
@@ -115,12 +176,16 @@ int ipc_send_log(const char *message)
 
 void ipc_close_queues(void)
 {
-    mq_close(ui_to_core_queue);
+    close(client_fd);
+    close(server_fd);
     mq_close(core_to_ui_queue);
+
+    /* core.c never calls ipc_cleanup(), so remove the socket file here */
+    unlink(CORE_SOCKET_PATH);
 }
 
 void ipc_cleanup(void)
 {
-    mq_unlink(UI_TO_CORE);
+    unlink(CORE_SOCKET_PATH);
     mq_unlink(CORE_TO_UI);
 }

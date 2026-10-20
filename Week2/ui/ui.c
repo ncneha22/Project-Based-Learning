@@ -3,17 +3,28 @@
 #include <string.h>
 #include <fcntl.h>
 #include <mqueue.h>
+#include <unistd.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
-#define UI_TO_CORE "/ui_to_core"
+/* UI sends commands to Core over a UNIX domain socket */
+#define CORE_SOCKET_PATH "/tmp/ipc_core_socket"
+
+/* UI receives replies from Core on a POSIX message queue */
 #define CORE_TO_UI "/core_to_ui"
 
 #define MAX_MESSAGE_SIZE 256
 #define MAX_MESSAGES 10
 
-void send_command(mqd_t queue, const char *command)
+void send_command(int sock, const char *command)
 {
-    if (mq_send(queue, command, strlen(command) + 1, 0) == -1)
+    char buffer[MAX_MESSAGE_SIZE + 1];
+
+    /* Newline marks the end of each command on the socket stream */
+    snprintf(buffer, sizeof(buffer), "%s\n", command);
+
+    if (write(sock, buffer, strlen(buffer)) == -1)
     {
         perror("Error sending command");
     }
@@ -50,19 +61,6 @@ int main()
     attributes.mq_msgsize = MAX_MESSAGE_SIZE;
     attributes.mq_curmsgs = 0;
 
-    mqd_t ui_to_core = mq_open(
-        UI_TO_CORE,
-        O_CREAT | O_WRONLY,
-        0666,
-        &attributes
-    );
-
-    if (ui_to_core == (mqd_t)-1)
-    {
-        perror("Error opening UI to Core queue");
-        return 1;
-    }
-
     mqd_t core_to_ui = mq_open(
         CORE_TO_UI,
         O_CREAT | O_RDONLY,
@@ -73,7 +71,29 @@ int main()
     if (core_to_ui == (mqd_t)-1)
     {
         perror("Error opening Core to UI queue");
-        mq_close(ui_to_core);
+        return 1;
+    }
+
+    struct sockaddr_un address;
+
+    int ui_to_core = socket(AF_UNIX, SOCK_STREAM, 0);
+
+    if (ui_to_core == -1)
+    {
+        perror("Error creating socket");
+        mq_close(core_to_ui);
+        return 1;
+    }
+
+    memset(&address, 0, sizeof(address));
+    address.sun_family = AF_UNIX;
+    strncpy(address.sun_path, CORE_SOCKET_PATH, sizeof(address.sun_path) - 1);
+
+    if (connect(ui_to_core, (struct sockaddr *)&address, sizeof(address)) == -1)
+    {
+        perror("Error connecting to Core (is Core running?)");
+        close(ui_to_core);
+        mq_close(core_to_ui);
         return 1;
     }
 
@@ -202,10 +222,9 @@ int main()
         }
     }
 
-    mq_close(ui_to_core);
+    close(ui_to_core);
     mq_close(core_to_ui);
 
-    mq_unlink(UI_TO_CORE);
     mq_unlink(CORE_TO_UI);
 
     printf("\nExiting simulator...\n");
