@@ -1,10 +1,14 @@
 #ifndef IPC_H
 #define IPC_H
 
-#define UI_TO_CORE "/ui_to_core"
+/* Core -> UI: POSIX message queue */
 #define CORE_TO_UI "/core_to_ui"
 
+/* Core -> Logger: named FIFO */
 #define LOGGER_FIFO "/tmp/ipc_logger_fifo"
+
+/* UI -> Core: UNIX domain socket */
+#define CORE_SOCKET_PATH "/tmp/ipc_core_socket"
 
 #define MAX_MESSAGE_SIZE 256
 #define MAX_MESSAGES 10
