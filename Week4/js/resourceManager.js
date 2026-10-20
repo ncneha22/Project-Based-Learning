@@ -298,7 +298,15 @@ window.DeadlockSim = window.DeadlockSim || {};
             return;
         }
 
-        const process = Number(document.getElementById("requestProcess").value);
+        const process = Number(
+            document.getElementById("requestProcess").value
+        );
+
+        if (!Number.isInteger(process) ||
+            process < 0 || process >= state.processCount) {
+            alert("Please select a valid process.");
+            return;
+        }
 
         const inputs = document.querySelectorAll("[data-request-resource]");
         const request = Array(state.resourceCount).fill(0);
@@ -307,7 +315,9 @@ window.DeadlockSim = window.DeadlockSim || {};
             const resource = Number(input.dataset.requestResource);
             const value = Number(input.value);
 
-            if (input.value.trim() === "" ||
+            if (!Number.isInteger(resource) ||
+                resource < 0 || resource >= state.resourceCount ||
+                input.value.trim() === "" ||
                 !Number.isInteger(value) || value < 0) {
                 alert("Requests must be non-negative integers.");
                 return;
@@ -321,11 +331,30 @@ window.DeadlockSim = window.DeadlockSim || {};
                 alert("Request exceeds the remaining Need of P" + process + ".");
                 return;
             }
+        }
 
-            if (request[j] > state.available[j]) {
-                alert("Not enough available resources. Request denied.");
-                return;
-            }
+        const result = document.getElementById("analysisResult");
+
+        function keepPending(message) {
+            state.request[process] = request.slice();
+            state.status = "WAITING";
+
+            result.className = "result-box unsafe";
+            result.textContent = message;
+
+            sim.log("Resource request from P" + process + " is pending.");
+        }
+
+        const unavailable = request.some(
+            (value, j) => value > state.available[j]
+        );
+
+        if (unavailable) {
+            keepPending(
+                "Request from P" + process +
+                " is pending because resources are unavailable."
+            );
+            return;
         }
 
         const oldAvailable = state.available.slice();
@@ -348,39 +377,25 @@ window.DeadlockSim = window.DeadlockSim || {};
             progress = false;
 
             for (let i = 0; i < state.processCount; i++) {
-                if (!finish[i]) {
-                    let canFinish = true;
+                if (finish[i]) continue;
 
+                const canFinish = state.need[i].every(
+                    (need, j) => need <= work[j]
+                );
+
+                if (canFinish) {
                     for (let j = 0; j < state.resourceCount; j++) {
-                        if (state.need[i][j] > work[j]) {
-                            canFinish = false;
-                            break;
-                        }
+                        work[j] += state.allocation[i][j];
                     }
 
-                    if (canFinish) {
-                        for (let j = 0; j < state.resourceCount; j++) {
-                            work[j] += state.allocation[i][j];
-                        }
-
-                        finish[i] = true;
-                        sequence.push("P" + i);
-                        progress = true;
-                    }
+                    finish[i] = true;
+                    sequence.push("P" + i);
+                    progress = true;
                 }
             }
         }
 
-        let safe = true;
-
-        for (let i = 0; i < state.processCount; i++) {
-            if (!finish[i]) {
-                safe = false;
-                break;
-            }
-        }
-
-        const result = document.getElementById("analysisResult");
+        const safe = finish.every(Boolean);
 
         if (safe) {
             state.request[process] = Array(state.resourceCount).fill(0);
@@ -396,7 +411,8 @@ window.DeadlockSim = window.DeadlockSim || {};
                 sequence.join(" → ");
 
             result.className = "result-box safe";
-            result.textContent = "Request granted to P" + process +
+            result.textContent =
+                "Request granted to P" + process +
                 ". The system remains in a safe state.";
 
             sim.log("Resource request granted to P" + process + ".");
@@ -405,11 +421,10 @@ window.DeadlockSim = window.DeadlockSim || {};
             state.allocation[process] = oldAllocation;
             state.need[process] = oldNeed;
 
-            result.className = "result-box unsafe";
-            result.textContent =
-                "Request denied. It would make the system unsafe.";
-
-            sim.log("Resource request denied to P" + process + ".");
+            keepPending(
+                "Request from P" + process +
+                " is pending because granting it would make the system unsafe."
+            );
         }
     };
 })(window.DeadlockSim);
