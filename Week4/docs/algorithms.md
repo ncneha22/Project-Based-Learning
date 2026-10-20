@@ -15,14 +15,18 @@ Steps:
 
 ## 2. Deadlock Detection
 
-**Purpose:** To identify processes that cannot proceed because of resource dependencies.
+**Purpose:** To identify processes that cannot finish because their outstanding resource requests cannot be satisfied.
 
 Steps:
-1. Examine the Available Resource Vector and outstanding requests.
-2. Check whether a process's outstanding request can be satisfied.
-3. If it can, assume the process finishes and releases its allocated resources.
-4. Repeat the check for the remaining processes.
-5. Identify processes that remain unfinished as potential deadlocked processes, according to the detection method used.
+1. Set Work equal to the Available Resource Vector.
+2. Mark processes with no allocated resources as finished. Mark the remaining processes as unfinished.
+3. Find an unfinished process whose outstanding Request is less than or equal to Work.
+4. Assume that process finishes and releases its allocated resources by adding its Allocation to Work.
+5. Mark the process as finished and repeat the search.
+6. Stop when all possible processes are finished or no further process can finish.
+7. Identify the unfinished processes as deadlocked according to this detection method.
+8. Display the deadlocked processes and, where applicable, the waiting chain showing which deadlocked process holds a requested resource.
+9. If the Resource Allocation Graph has already been displayed, refresh it to highlight the deadlocked processes and relevant edges.
 
 ## 3. Resource Request Algorithm
 

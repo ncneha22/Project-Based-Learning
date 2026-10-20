@@ -13,8 +13,51 @@ window.DeadlockSim = window.DeadlockSim || {};
         request: [],
         safeSequence: [],
         deadlockedProcesses: [],
-        status: "NOT RUN"
+        status: "NOT RUN",
+        dataReady: false
     };
+
+    // Invalidate calculated results when the user edits resource data.
+    document.addEventListener("input", function (event) {
+        const target = event.target;
+
+        if (!target || typeof target.matches !== "function") return;
+
+        if (!target.matches(
+            '[data-matrix="allocation"], [data-matrix="maximum"], [data-total-resource]'
+        )) return;
+
+        const state = sim.state;
+        if (state.processCount === 0) return;
+
+        state.dataReady = false;
+        state.status = "NOT RUN";
+        state.safeSequence = [];
+        state.deadlockedProcesses = [];
+        state.request = createMatrix(
+            state.processCount,
+            state.resourceCount
+        );
+
+        const status = document.getElementById("systemStatus");
+        const sequence = document.getElementById("safeSequenceSummary");
+        const needMatrix = document.getElementById("needMatrix");
+        const availableVector = document.getElementById("availableVector");
+        const result = document.getElementById("analysisResult");
+
+        if (status) status.textContent = "NOT RUN";
+        if (sequence) sequence.textContent = "—";
+        if (needMatrix) needMatrix.textContent =
+            "Input changed. Recalculate Need and Available.";
+        if (availableVector) availableVector.textContent =
+            "Input changed. Recalculate Need and Available.";
+
+        if (result) {
+            result.className = "result-box";
+            result.textContent =
+                "Resource data changed. Click Calculate Need & Available before running an analysis or making a request.";
+        }
+    });
 
     sim.log = function (message) {
         const logBox = document.getElementById("systemLog");
@@ -149,6 +192,7 @@ window.DeadlockSim = window.DeadlockSim || {};
         state.safeSequence = [];
         state.deadlockedProcesses = [];
         state.status = "NOT RUN";
+        state.dataReady = false;
 
         makeResourceInputs();
         makeMatrixTable("allocationMatrix", state.allocation, true, "allocation");
@@ -247,6 +291,12 @@ window.DeadlockSim = window.DeadlockSim || {};
                     return false;
                 }
 
+                if (maximum[i][j] > total[j]) {
+                    alert("Maximum for P" + i + ", R" + j +
+                        " cannot exceed the system's total resource count.");
+                    return false;
+                }
+
                 available[j] -= allocation[i][j];
             }
         }
@@ -275,6 +325,7 @@ window.DeadlockSim = window.DeadlockSim || {};
         state.safeSequence = [];
         state.deadlockedProcesses = [];
         state.status = "NOT RUN";
+        state.dataReady = true;
 
         makeMatrixTable("allocationMatrix", state.allocation, true, "allocation");
         makeMatrixTable("maximumMatrix", state.maximum, true, "maximum");
@@ -298,13 +349,17 @@ window.DeadlockSim = window.DeadlockSim || {};
             return;
         }
 
-        const process = Number(
-            document.getElementById("requestProcess").value
-        );
+        if (state.dataReady !== true) {
+            alert("Enter valid resource data and click Calculate Need & Available first.");
+            return;
+        }
+
+        const process = Number(document.getElementById("requestProcess").value);
 
         if (!Number.isInteger(process) ||
-            process < 0 || process >= state.processCount) {
-            alert("Please select a valid process.");
+            process < 0 ||
+            process >= state.processCount) {
+            alert("Select a valid process for the resource request.");
             return;
         }
 
@@ -315,9 +370,7 @@ window.DeadlockSim = window.DeadlockSim || {};
             const resource = Number(input.dataset.requestResource);
             const value = Number(input.value);
 
-            if (!Number.isInteger(resource) ||
-                resource < 0 || resource >= state.resourceCount ||
-                input.value.trim() === "" ||
+            if (input.value.trim() === "" ||
                 !Number.isInteger(value) || value < 0) {
                 alert("Requests must be non-negative integers.");
                 return;
@@ -331,30 +384,29 @@ window.DeadlockSim = window.DeadlockSim || {};
                 alert("Request exceeds the remaining Need of P" + process + ".");
                 return;
             }
-        }
 
-        const result = document.getElementById("analysisResult");
+            if (request[j] > state.available[j]) {
+                state.request[process] = request.slice();
+                state.status = "WAITING";
 
-        function keepPending(message) {
-            state.request[process] = request.slice();
-            state.status = "WAITING";
+                const status = document.getElementById("systemStatus");
+                const sequence = document.getElementById("safeSequenceSummary");
+                const result = document.getElementById("analysisResult");
 
-            result.className = "result-box unsafe";
-            result.textContent = message;
+                if (status) status.textContent = "WAITING";
+                if (sequence) sequence.textContent = "—";
 
-            sim.log("Resource request from P" + process + " is pending.");
-        }
+                if (result) {
+                    result.className = "result-box";
+                    result.textContent =
+                        "Request for P" + process +
+                        " is waiting because the required resources are not currently available. Run deadlock detection to inspect pending requests.";
+                }
 
-        const unavailable = request.some(
-            (value, j) => value > state.available[j]
-        );
-
-        if (unavailable) {
-            keepPending(
-                "Request from P" + process +
-                " is pending because resources are unavailable."
-            );
-            return;
+                sim.log("Resource request for P" + process +
+                    " is waiting for available resources.");
+                return;
+            }
         }
 
         const oldAvailable = state.available.slice();
@@ -377,25 +429,39 @@ window.DeadlockSim = window.DeadlockSim || {};
             progress = false;
 
             for (let i = 0; i < state.processCount; i++) {
-                if (finish[i]) continue;
+                if (!finish[i]) {
+                    let canFinish = true;
 
-                const canFinish = state.need[i].every(
-                    (need, j) => need <= work[j]
-                );
-
-                if (canFinish) {
                     for (let j = 0; j < state.resourceCount; j++) {
-                        work[j] += state.allocation[i][j];
+                        if (state.need[i][j] > work[j]) {
+                            canFinish = false;
+                            break;
+                        }
                     }
 
-                    finish[i] = true;
-                    sequence.push("P" + i);
-                    progress = true;
+                    if (canFinish) {
+                        for (let j = 0; j < state.resourceCount; j++) {
+                            work[j] += state.allocation[i][j];
+                        }
+
+                        finish[i] = true;
+                        sequence.push("P" + i);
+                        progress = true;
+                    }
                 }
             }
         }
 
-        const safe = finish.every(Boolean);
+        let safe = true;
+
+        for (let i = 0; i < state.processCount; i++) {
+            if (!finish[i]) {
+                safe = false;
+                break;
+            }
+        }
+
+        const result = document.getElementById("analysisResult");
 
         if (safe) {
             state.request[process] = Array(state.resourceCount).fill(0);
@@ -411,8 +477,7 @@ window.DeadlockSim = window.DeadlockSim || {};
                 sequence.join(" → ");
 
             result.className = "result-box safe";
-            result.textContent =
-                "Request granted to P" + process +
+            result.textContent = "Request granted to P" + process +
                 ". The system remains in a safe state.";
 
             sim.log("Resource request granted to P" + process + ".");
@@ -420,11 +485,13 @@ window.DeadlockSim = window.DeadlockSim || {};
             state.available = oldAvailable;
             state.allocation[process] = oldAllocation;
             state.need[process] = oldNeed;
+            state.request[process] = Array(state.resourceCount).fill(0);
 
-            keepPending(
-                "Request from P" + process +
-                " is pending because granting it would make the system unsafe."
-            );
+            result.className = "result-box unsafe";
+            result.textContent =
+                "Request denied. It would make the system unsafe.";
+
+            sim.log("Resource request denied to P" + process + ".");
         }
     };
 })(window.DeadlockSim);
