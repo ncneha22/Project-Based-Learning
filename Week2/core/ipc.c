@@ -160,7 +160,14 @@ int ipc_send_log(const char *message)
         return 0;
     }
 
-    snprintf(buffer, sizeof(buffer), "INFO|%s", message);
+    if (strncmp(message, "ERROR:", 6) == 0)
+    {
+        snprintf(buffer, sizeof(buffer), "ERROR|%s", message);
+    }
+    else
+    {
+        snprintf(buffer, sizeof(buffer), "INFO|%s", message);
+    }
 
     if (write(fd, buffer, strlen(buffer)) == -1)
     {
