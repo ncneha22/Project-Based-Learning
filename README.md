@@ -1,19 +1,19 @@
 # Project-Based Learning
 
-This repository contains the work completed as part of the
-Project-Based Learning course.
+This repository contains the project work completed as part of the Project-Based Learning course.
 
-## Project Work
+## Week 1: Inter-Process Communication (IPC)
 
-- **Week 2:** Inter-Process Communication (IPC) - Multi-Process Simulator
-- **Week 3:** Refer to the Week3 project files.
-- **Week 4:** Refer to the Week4 project files.
+An introduction to Inter-Process Communication, covering its definition, need, types, methods, techniques, advantages, importance, and real-world applications.
 
-## Documentation
+## Week 2: Multi-Process IPC Simulator
 
-- [Week 2 README](Week2/README.md)
-- [Week 2 Architecture](Week2/docs/architecture.md)
-- [Week 2 IPC Design](Week2/docs/IPC_DESIGN.md)
-- [Week 2 Flowchart](Week2/docs/flowchart.md)
-- [Week 2 Test Cases](Week2/tests/IPC_TEST_CASES.md)
-- [Week 2 Benchmark Results](Week2/benchmark/BENCHMARK_RESULTS.md)
+Implementation of a multi-process simulator consisting of UI, Core, and Logger processes. The processes communicate using UNIX domain sockets, POSIX message queues, and named FIFOs. The Core supports CPU, memory, stack, and queue operations, while the Logger records execution and error messages.
+
+## Week 3: Process Scheduling Simulator
+
+A C-based CPU scheduling simulator implementing FCFS, non-preemptive SJF, preemptive SRTF, preemptive and non-preemptive Priority Scheduling, and Round Robin. It displays scheduling order, Gantt charts, and performance metrics such as waiting time, turnaround time, response time, and CPU utilization.
+
+## Week 4: Resource Management and Deadlock Simulation
+
+Implementation of resource allocation and deadlock management, including allocation and maximum matrices, the Need matrix, Banker's algorithm, resource requests, deadlock detection, and recovery.
