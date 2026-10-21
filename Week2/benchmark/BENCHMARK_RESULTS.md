@@ -1,24 +1,31 @@
 # Benchmark Results
 
-## Objective
+## 1. Objective
 
-To compare the performance of the standalone simulator with the multi-process simulator using IPC.
+To compare the previously recorded performance of the standalone
+simulator with the multi-process simulator using IPC.
 
-## Benchmark Results
+## 2. Previously Recorded Results
+
+The following values were present in the earlier benchmark
+document. They have not been independently reproduced during
+the current integration testing.
 
 | Measurement | Standalone | Multi-Process |
 |---|---:|---:|
 | Real Time | 0.016 s | 0.006 s |
 
-## CPU and Memory Usage
+## 3. Previously Recorded CPU and Memory Usage
 
 ### Standalone Simulator
+
 - User time: 0.01 s
 - System time: 0.00 s
 - CPU usage: 100%
 - Maximum memory usage: 1528 KB
 
 ### Multi-Process Simulator
+
 - Core CPU usage: 0.0%
 - UI CPU usage: 0.0%
 - Logger CPU usage: 0.0%
@@ -27,18 +34,36 @@ To compare the performance of the standalone simulator with the multi-process si
 - Logger memory (RSS): 1628 KB
 - Total memory (RSS): 5316 KB (approximately 5.2 MB)
 
-## IPC Overhead
+These are historical measurements from the earlier document,
+not fresh measurements from the current test session.
 
-The multi-process simulator introduces IPC communication between the UI, Core, and Logger processes. IPC and process management introduce additional system overhead.
+## 4. IPC Overhead
 
-The measured workload was small, so the timing difference should not be interpreted as a general performance advantage.
+The multi-process simulator uses a UNIX domain socket for
+UI-to-Core commands, a POSIX message queue for Core-to-UI
+responses, and a named FIFO for Core-to-Logger messages.
 
-## Performance Analysis
+Inter-process communication and managing separate processes
+can introduce additional overhead.
 
-The standalone simulator runs within a single process, while the multi-process simulator separates the UI, Core, and Logger into independent processes.
+## 5. Performance Analysis
 
-The multi-process design provides process separation and IPC-based communication, but process management and IPC can introduce additional overhead.
+The standalone simulator runs within one process, while the
+multi-process simulator separates UI, Core, and Logger.
 
-## Conclusion
+The multi-process design provides process separation and
+modular communication. However, the recorded timing values
+alone are insufficient to establish a general performance
+advantage.
 
-The benchmark was successfully performed for the standalone and multi-process simulator. The functional IPC tests also confirmed that communication between UI, Core, and Logger works correctly.
+A fair comparison requires the same workload, comparable
+execution conditions, repeated measurements, and a documented
+measurement method.
+
+## 6. Conclusion
+
+The historical benchmark values are retained for reference.
+They should not be treated as freshly verified results.
+The current integration tests verified the simulator's
+functional operations and IPC communication, including
+recording a division-by-zero error in the error log.
