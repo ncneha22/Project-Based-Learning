@@ -29,5 +29,6 @@ void run_lru(int pages[], int referenceCount,
 /* Optimal algorithm */
 void run_optimal(int pages[], int referenceCount,
                  int frameCount, PageResult *result);
+void start_gui(void);
 
 #endif
