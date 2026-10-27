@@ -298,12 +298,19 @@ static void run_simulation(GtkWidget *button,
 
         g_string_append_printf(
             output,
-            "FIFO faults: %d\n"
-            "LRU faults: %d\n"
-            "Optimal faults: %d\n",
-            fifo_faults,
-            lru_faults,
-            optimal_faults);
+            "Algorithm   Hits   Faults   Hit Ratio   Fault Ratio\n"
+            "FIFO        %d      %d       %.2f%%       %.2f%%\n"
+            "LRU         %d      %d       %.2f%%       %.2f%%\n"
+            "Optimal     %d      %d       %.2f%%       %.2f%%\n",
+            fifo_result.pageHits, fifo_result.pageFaults,
+            fifo_result.pageHits * 100.0 / count,
+            fifo_result.pageFaults * 100.0 / count,
+            lru_result.pageHits, lru_result.pageFaults,
+            lru_result.pageHits * 100.0 / count,
+            lru_result.pageFaults * 100.0 / count,
+            optimal_result.pageHits, optimal_result.pageFaults,
+            optimal_result.pageHits * 100.0 / count,
+            optimal_result.pageFaults * 100.0 / count);
     }
 
     show_message(output->str);
