@@ -17,3 +17,7 @@ A C-based CPU scheduling simulator implementing FCFS, non-preemptive SJF, preemp
 ## Week 4: Resource Management and Deadlock Simulation
 
 Implementation of resource allocation and deadlock management, including allocation and maximum matrices, the Need matrix, Banker's algorithm, resource requests, deadlock detection, and recovery.
+
+## Week 5: Simulation and Comparative Analysis of Page Replacement Algorithms
+
+A C-based page replacement simulator with a GTK 3 graphical interface. It implements FIFO, LRU, and Optimal page replacement algorithms and allows users to compare their performance. The application displays page-frame changes step by step, page hits, page faults, hit and fault ratios, and comparative charts.
