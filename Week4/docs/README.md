@@ -1,79 +1,44 @@
 # Interactive Deadlock Simulation System
 
 ## Project Overview
-
-The Interactive Deadlock Simulation System is a web-based educational project for understanding resource allocation, safe states, deadlock detection, and recovery in operating systems. It also provides a Reset Simulation feature that allows users to return the application to its initial state.
-
-## Objectives
-
-- Represent processes and resource types.
-- Maintain allocation, maximum requirement, and resource request information.
-- Calculate the Need Matrix and Available Resource Vector.
-- Apply Banker's Algorithm to check system safety.
-- Display a Resource Allocation Graph with process and resource nodes.
-- Show resource allocation and request relationships in the graph.
-- Detect deadlocks and display the affected processes and waiting chain.
-- Highlight deadlocked processes and relevant graph edges.
-- Demonstrate resource request evaluation and deadlock recovery.
-- Reset the simulation to its initial state using a confirmation popup.
+The Interactive Deadlock Simulation System is a desktop application developed using C and GTK 3. It demonstrates resource allocation, Banker's Algorithm, deadlock detection, Resource Allocation Graph visualization, and deadlock recovery.
 
 ## Technologies Used
+- C programming language
+- GTK 3
+- Cairo
+- GCC compiler
 
-- HTML for the interface.
-- CSS for styling.
-- JavaScript for simulation logic and interaction.
-- SVG for drawing the Resource Allocation Graph.
+## Main Features
+1. Dashboard for creating, loading, and resetting systems.
+2. Matrices for viewing Allocation, Maximum, Need, and Available resources.
+3. Banker's Algorithm for checking system safety and displaying a safe sequence.
+4. Deadlock Detection for identifying deadlock conditions.
+5. Resource Allocation Graph for displaying processes, resources, and request/allocation edges.
+6. Requests and Recovery for requesting resources, releasing resources, and recovering processes.
 
-## Project Structure
+## Project Files
+- `main.c` – Initializes GTK and starts the application.
+- `app.c` – Handles the graphical interface and user interactions.
+- `app.h` – Application declarations.
+- `bankers.c` – Banker's Algorithm.
+- `deadlock.c` – Deadlock detection.
+- `rag.c` – Resource Allocation Graph logic.
+- `recovery.c` – Process recovery.
+- `resource_manager.c` – Resource requests and releases.
+- `deadlock.h` – Shared system structures and declarations.
+- `resource_manager.h` – Resource manager declarations.
+- `testing_report.md` – Testing report.
 
-- `index.html` — main webpage.
-- `style.css` — page styling.
-- `js/main.js` — interface and event handling.
-- `js/resourceManager.js` — process and resource state management.
-- `js/bankers.js` — Banker's Algorithm.
-- `js/deadlock.js` — deadlock detection and waiting-chain output.
-- `js/rag.js` — Resource Allocation Graph visualization.
-- `js/recovery.js` — recovery operations.
-- `docs/README.md` — project overview and instructions.
-- `docs/algorithms.md` — algorithm descriptions.
-- `docs/flowchart.md` — system flowchart.
-- `docs/testing_report.md` — testing records and test plan.
+## Compilation
+Run from the Week4 directory:
 
-## How to Run
+    gcc -Wall -Wextra -std=c11 main.c app.c bankers.c deadlock.c rag.c recovery.c resource_manager.c -o deadlock_gui $(pkg-config --cflags --libs gtk+-3.0) -lm
 
-1. Open a terminal in the project directory.
-2. Navigate to the Week4 project folder using `cd Week4`.
-3. Start a local server using `python3 -m http.server 8000`.
-4. Open `http://localhost:8000` in a browser.
-5. Configure processes and resources, enter the required matrices, and run the available simulations.
-6. Use the **Reset Simulation** button to restart the simulation when needed. Confirm the popup to reload the application to its initial state.
+## Execution
+After compilation, run:
 
-## Core Concepts
+    ./deadlock_gui
 
-### Banker's Algorithm
-
-Checks whether resource allocation leaves the system in a safe state and determines a safe sequence when one exists.
-
-### Deadlock Detection
-
-Examines available resources, process allocations, and outstanding requests to identify processes that cannot finish under the detection procedure.
-
-### Resource Allocation Graph
-
-Visualizes processes, resource types, resource allocations, and outstanding requests. When a deadlock is detected, the graph can highlight deadlocked processes and relevant edges.
-
-### Resource Requests
-
-Evaluates resource requests against the applicable limits and available resources before checking whether a request can be granted safely.
-
-### Deadlock Recovery
-
-Demonstrates releasing resources from a selected process after a deadlock is identified.
-
-### Reset Simulation
-
-Provides a confirmation popup before reloading the application. When the user confirms, the simulation returns to its initial state. If the user cancels, the current simulation should remain unchanged.
-
-## Documentation
-
-Refer to `algorithms.md`, `flowchart.md`, and `testing_report.md` in this directory for further information.
+## Testing
+Refer to `testing_report.md` for testing details and results.
